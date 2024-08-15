@@ -181,3 +181,54 @@ kNNFit <- train(model,
               tuneGrid = expand.grid(k = seq(from = 1, to = 40, by = 1)))
 ```
 
+Practice Function
+```{r}
+modeling_function <- function(method, variables){
+  variable_list <- paste(variables, collapse = " + ")
+  func_model <- as.formula(paste("diagnosis ~", variable_list))
+  if (method == "kNN"){
+kNNFit_func <- train(func_model, 
+              data = train,
+              method = "knn",
+              preProcess = c("center", "scale"),
+              trControl = trainControl(method = "repeatedcv", 
+                                       number = 10,
+                                       repeats = 3),
+              tuneGrid = expand.grid(k = seq(from = 1, to = 40, by = 1)))
+return(kNNFit_func)
+  }
+  if (method == "tree"){
+treeFit_func <- train(func_model, 
+              data = train,
+              method = "rpart",
+              preProcess = c("center", "scale"),
+              trControl = trainControl(method = "repeatedcv", 
+                                       number = 10,
+                                       repeats = 3),
+              tuneGrid = expand.grid(cp = seq(from = 0, to = 0.1, by = 0.001)))    
+return(treeFit_func)
+  }
+  if (method == "logistic"){
+logFit_func <- train(func_model, 
+              data = train,
+              preProcess = c("center", "scale"),
+              method = "glm",
+              family = "binomial",
+              trControl = trainControl(method = "repeatedcv", 
+                                       number = 10,
+                                       repeats = 3))
+return(logFit_func)
+  }
+}
+```
+
+```{r}
+modeling_function(method = "kNN", variables = c("radius_mean","fractal_dimension_mean","texture_se"))
+```
+```{r}
+variables_test = c("radius_mean","area_mean","fractal_dimension_mean")
+variable_list_test <- paste(variables_test, collapse = " + ")
+variable_list_test
+func_model <- diagnosis ~ variable_list
+```
+
