@@ -18,6 +18,9 @@ fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
+          selectInput("method", label = "Modeling Method", 
+                      choices = c("logistic", "kNN", "tree"),
+                      selected = "logistic"),
           uiOutput("columns")
         ),
         

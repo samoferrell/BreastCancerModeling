@@ -24,7 +24,7 @@ function(input, output, session) {
                            trControl = trainControl(method = "repeatedcv", 
                                                     number = 10,
                                                     repeats = 3),
-                           tuneGrid = expand.grid(k = seq(from = 1, to = 40, by = 1)))
+                           tuneGrid = expand.grid(k = seq(from = 1, to = 10, by = 1)))
       return(kNNFit_func)
     }
     if (method == "tree"){
@@ -35,7 +35,7 @@ function(input, output, session) {
                             trControl = trainControl(method = "repeatedcv", 
                                                      number = 10,
                                                      repeats = 3),
-                            tuneGrid = expand.grid(cp = seq(from = 0, to = 0.1, by = 0.001)))    
+                            tuneGrid = expand.grid(cp = seq(from = 0, to = 0.1, by = 0.01)))    
       return(treeFit_func)
     }
     if (method == "logistic"){
@@ -71,8 +71,14 @@ function(input, output, session) {
     })
   output$formula <- renderPrint({
     selected_variables <- input$variables
-    fit <- modeling_function(method = "logistic", variables = selected_variables)
+    selected_method <- input$method
+    if (length(selected_variables) > 0){
+    fit <- modeling_function(method = selected_method, variables = selected_variables)
     print(fit)
+    }
+    else if (length(selected_variables) == 0){
+      print("Please selected at least one variable as a predictor")}
+    
   })
 
 }
