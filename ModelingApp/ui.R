@@ -27,7 +27,11 @@ fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
           dataTableOutput("summary"),
-          verbatimTextOutput("formula")
+          verbatimTextOutput("formula"),
+          uiOutput("pred1"),
+          uiOutput("pred2"),
+          uiOutput("pred3"),
+          uiOutput("pred4")
           
         )
     )

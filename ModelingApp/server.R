@@ -62,23 +62,56 @@ function(input, output, session) {
   train <- data[split, ]
   test <- data[-split, ]
   
+  output$columns <- renderUI({
+    checkboxGroupInput("variables", "Select Predictor Variables", 
+                       choices = colnames(data))})
+  selected_variables <- reactive(input$variables)
+  
+  selected_method <- reactive(input$method)
+  
+  # creating inputs for all predictors
+  
+  output$pred1 <- renderUI({
+    if (length(selected_variables()) > 0){
+    vars <- selected_variables()
+    numericInput("pred1", vars[1], value = round(mean(data[[vars[1]]]),3))
+    }
+    })
+  output$pred2 <- renderUI({
+    if (length(selected_variables()) > 1){
+    vars <- selected_variables()
+    numericInput("pred2", vars[2], value = round(mean(data[[vars[2]]]),3))
+    }
+  })
+  output$pred3 <- renderUI({
+    if (length(selected_variables()) > 2){
+    vars <- selected_variables()
+    numericInput("pred3", vars[3], value = round(mean(data[[vars[3]]]),3))
+    }
+  })
+  output$pred4 <- renderUI({
+    if (length(selected_variables()) > 3){
+    vars <- selected_variables()
+    numericInput("pred4", vars[4], value = round(mean(data[[vars[4]]]),3))
+    }
+  })
+  
   output$summary <- DT::renderDataTable({
-
-      output$columns <- renderUI({
-        checkboxGroupInput("variables", "Select Predictor Variables", 
-                           choices = colnames(data))})
       data
     })
-  output$formula <- renderPrint({
-    selected_variables <- input$variables
-    selected_method <- input$method
-    if (length(selected_variables) > 0){
-    fit <- modeling_function(method = selected_method, variables = selected_variables)
-    print(fit)
-    }
-    else if (length(selected_variables) == 0){
-      print("Please selected at least one variable as a predictor")}
-    
-  })
 
-}
+  output$formula <- renderPrint({
+
+    if (length(selected_variables()) > 0 & length(selected_variables()) < 5){
+    fit <- modeling_function(method = selected_method(), variables = selected_variables())
+    print(fit)
+    print(confusionMatrix(fit, newdata = test)) }
+    
+    else {
+      print("Please select 1 - 3 variables as predictors")} })
+    
+
+    
+  }
+
+

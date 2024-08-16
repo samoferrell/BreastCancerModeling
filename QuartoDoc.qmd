@@ -223,12 +223,21 @@ return(logFit_func)
 ```
 
 ```{r}
-modeling_function(method = "kNN", variables = c("radius_mean","fractal_dimension_mean","texture_se"))
+fit_test <- modeling_function(method = "logistic", variables = c("radius_mean","fractal_dimension_mean","texture_se"))
 ```
+
 ```{r}
-variables_test = c("radius_mean","area_mean","fractal_dimension_mean")
+variables_test = c("radius_mean","fractal_dimension_mean","texture_se")
 variable_list_test <- paste(variables_test, collapse = " + ")
 variable_list_test
 func_model <- diagnosis ~ variable_list
+```
+
+Practice Prediction
+```{r}
+pred_obs <- data.frame(radius_mean = 20,
+                      fractal_dimension_mean = 0.05,
+                      texture_se = 1)
+prediction <- predict(fit_test, newdata = pred_obs)
 ```
 
