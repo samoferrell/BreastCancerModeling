@@ -147,7 +147,7 @@ test <- data[-split, ]
 Logistic Model
 ```{r}
 model <- diagnosis ~ concavity_mean + symmetry_mean + radius_mean + texture_mean
-logFit <- train(log_model, 
+logFit <- train(model, 
               data = train,
               preProcess = c("center", "scale"),
               method = "glm",
@@ -178,7 +178,7 @@ kNNFit <- train(model,
               trControl = trainControl(method = "repeatedcv", 
                                        number = 10,
                                        repeats = 3),
-              tuneGrid = expand.grid(k = seq(from = 1, to = 40, by = 1)))
+              tuneGrid = expand.grid(k = seq(from = 1, to = 5, by = 1)))
 ```
 
 Practice Function

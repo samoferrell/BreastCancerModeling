@@ -9,8 +9,9 @@
 
 library(shiny)
 library(DT)
+library(tidyverse)
+library(caret)
 
-# Define server logic required to draw a histogram
 function(input, output, session) {
 #function for modeling
   modeling_function <- function(method, variables){
@@ -62,15 +63,14 @@ function(input, output, session) {
   train <- data[split, ]
   test <- data[-split, ]
   
+  # Creating interactive columns
   output$columns <- renderUI({
     checkboxGroupInput("variables", "Select Predictor Variables", 
                        choices = colnames(data))})
   selected_variables <- reactive(input$variables)
-  
   selected_method <- reactive(input$method)
   
-  # creating inputs for all predictors
-  
+  # creating inputs for 4 predictors
   output$pred1 <- renderUI({
     if (length(selected_variables()) > 0){
     vars <- selected_variables()
@@ -100,18 +100,36 @@ function(input, output, session) {
       data
     })
 
+  # Creating the reactive fit
+  fit <- reactive(modeling_function(method = selected_method(), variables = selected_variables()))
+  
+  # printing fit if 1-4 variables are chosen
   output$formula <- renderPrint({
-
     if (length(selected_variables()) > 0 & length(selected_variables()) < 5){
-    fit <- modeling_function(method = selected_method(), variables = selected_variables())
-    print(fit)
-    print(confusionMatrix(fit, newdata = test)) }
-    
+    print(fit())
+    print(confusionMatrix(fit(), newdata = test)) }
     else {
-      print("Please select 1 - 3 variables as predictors")} })
-    
-
-    
+      print("Please select 1 - 4 variables as predictors")} })
+  
+  # if 4 variables are chosen, the interactive numerical inputs allow the user to predict if the tumor is bengin,
+  # based on the inputs and the fit that was created above
+  output$prediction <- renderPrint({
+    vars <- selected_variables()
+    values <- c(input$pred1,input$pred2,input$pred3,input$pred4)
+    accuracy <- reactive((round(max(fit()$results$Accuracy),2) * 100))
+    if (length(vars) == 4){
+      names <- c(vars[1],vars[2],vars[3],vars[4])
+      pred_obs <- data.frame(setNames(as.list(values), names))
+      pred_obs
+      prediction <- predict(fit(), newdata = pred_obs)
+      prediction
+    if (as.character(prediction) == "B"){
+        cat("Using the", accuracy(), "% accurate fit, we predict this tumor to be Benign")}
+      else {
+        cat("Using the", accuracy(), "% accurate fit, we predict this tumor to be Malignant")}
+      
+}
+  })
   }
 
 

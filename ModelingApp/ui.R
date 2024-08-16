@@ -9,13 +9,11 @@
 
 library(shiny)
 
-# Define UI for application that draws a histogram
 fluidPage(
 
     # Application title
     titlePanel("Breast Cancer Modeling App"),
 
-    # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
           selectInput("method", label = "Modeling Method", 
@@ -24,15 +22,16 @@ fluidPage(
           uiOutput("columns")
         ),
         
-        # Show a plot of the generated distribution
         mainPanel(
           dataTableOutput("summary"),
           verbatimTextOutput("formula"),
+          h3("Please select 4 inputs to make a prediction"),
+          p("Each numerical input automatically takes the value of the mean for that variable."),
           uiOutput("pred1"),
           uiOutput("pred2"),
           uiOutput("pred3"),
-          uiOutput("pred4")
-          
+          uiOutput("pred4"),
+          verbatimTextOutput("prediction")
         )
     )
 )
