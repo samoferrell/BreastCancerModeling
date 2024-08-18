@@ -14,7 +14,10 @@ library(caret)
 
 function(input, output, session) {
 #function for modeling
-  modeling_function <- function(method, variables){
+  modeling_function <- function(method, variables, 
+                                num_folds, num_repeats, 
+                                k_low = 1, k_high = 10, k_inc = 1,
+                                cp_low = 0, cp_high = 0.1, cp_inc = 0.01){
     variable_list <- paste(variables, collapse = " + ")
     func_model <- as.formula(paste("diagnosis ~", variable_list))
     if (method == "kNN"){
@@ -23,9 +26,9 @@ function(input, output, session) {
                            method = "knn",
                            preProcess = c("center", "scale"),
                            trControl = trainControl(method = "repeatedcv", 
-                                                    number = 10,
-                                                    repeats = 3),
-                           tuneGrid = expand.grid(k = seq(from = 1, to = 10, by = 1)))
+                                                    number = num_folds,
+                                                    repeats = num_repeats),
+                           tuneGrid = expand.grid(k = seq(from = k_low, to = k_high, by = k_inc)))
       return(kNNFit_func)
     }
     if (method == "tree"){
@@ -34,9 +37,9 @@ function(input, output, session) {
                             method = "rpart",
                             preProcess = c("center", "scale"),
                             trControl = trainControl(method = "repeatedcv", 
-                                                     number = 10,
-                                                     repeats = 3),
-                            tuneGrid = expand.grid(cp = seq(from = 0, to = 0.1, by = 0.01)))    
+                                                     number = num_folds,
+                                                     repeats = num_repeats),
+                            tuneGrid = expand.grid(cp = seq(from = cp_low, to = cp_high, by = cp_inc)))    
       return(treeFit_func)
     }
     if (method == "logistic"){
@@ -46,8 +49,8 @@ function(input, output, session) {
                            method = "glm",
                            family = "binomial",
                            trControl = trainControl(method = "repeatedcv", 
-                                                    number = 10,
-                                                    repeats = 3))
+                                                    number = num_folds,
+                                                    repeats = num_repeats))
       return(logFit_func)
     }
   }
@@ -67,8 +70,20 @@ function(input, output, session) {
   output$columns <- renderUI({
     checkboxGroupInput("variables", "Select Predictor Variables", 
                        choices = colnames(data))})
+  
+  # reactive function parameters
   selected_variables <- reactive(input$variables)
   selected_method <- reactive(input$method)
+  selected_folds <- reactive(input$folds)
+  selected_repeats <- reactive(input$repeats)
+  selected_k_low <- reactive(input$k_low)
+  selected_k_high <- reactive(input$k_high)
+  selected_k_inc <- reactive(input$k_inc)
+  selected_cp_low <- reactive(input$cp_low)
+  selected_cp_high <- reactive(input$cp_high)
+  selected_cp_inc <- reactive(input$cp_inc)
+  
+  
   
   # creating inputs for 4 predictors
   output$pred1 <- renderUI({
@@ -101,7 +116,16 @@ function(input, output, session) {
     })
 
   # Creating the reactive fit
-  fit <- reactive(modeling_function(method = selected_method(), variables = selected_variables()))
+  fit <- reactive(modeling_function(method = selected_method(), 
+                                    variables = selected_variables(), 
+                                    num_folds = selected_folds(),
+                                    num_repeats = selected_repeats(),
+                                    k_low = selected_k_low(), 
+                                    k_high = selected_k_high(), 
+                                    k_inc = selected_k_inc(),
+                                    cp_low = selected_cp_low(), 
+                                    cp_high = selected_cp_high(), 
+                                    cp_inc = selected_cp_inc()))
   
   # printing fit if 1-4 variables are chosen
   output$formula <- renderPrint({
