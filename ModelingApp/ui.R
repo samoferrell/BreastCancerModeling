@@ -37,12 +37,23 @@ fluidPage(
         mainPanel(
           dataTableOutput("summary"),
           verbatimTextOutput("formula"),
-          h3("Please select 4 inputs to make a prediction"),
-          p("Each numerical input automatically takes the value of the mean for that variable."),
+          h3("Please select up to 10 inputs to make a prediction"),
+          h4("Each numerical input automatically takes the value of the mean for that variable."),
           uiOutput("pred1"),
           uiOutput("pred2"),
           uiOutput("pred3"),
           uiOutput("pred4"),
+          uiOutput("pred5"),
+          uiOutput("pred6"),
+          uiOutput("pred7"),
+          uiOutput("pred8"),
+          uiOutput("pred9"),
+          uiOutput("pred10"),
+          uiOutput("pred11"),
+          uiOutput("pred12"),
+          uiOutput("pred13"),
+          uiOutput("pred14"),
+          uiOutput("pred15"),
           verbatimTextOutput("prediction")
         )
     )

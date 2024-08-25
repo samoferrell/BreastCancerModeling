@@ -110,6 +110,72 @@ function(input, output, session) {
     numericInput("pred4", vars[4], value = round(mean(data[[vars[4]]]),3))
     }
   })
+  output$pred5 <- renderUI({
+    if (length(selected_variables()) > 4) {
+      vars <- selected_variables()
+      numericInput("pred5", vars[5], value = round(mean(data[[vars[5]]]), 3))
+    }
+  })
+  output$pred6 <- renderUI({
+    if (length(selected_variables()) > 5) {
+      vars <- selected_variables()
+      numericInput("pred6", vars[6], value = round(mean(data[[vars[6]]]), 3))
+    }
+  })
+  output$pred7 <- renderUI({
+    if (length(selected_variables()) > 6) {
+      vars <- selected_variables()
+      numericInput("pred7", vars[7], value = round(mean(data[[vars[7]]]), 3))
+    }
+  })
+  output$pred8 <- renderUI({
+    if (length(selected_variables()) > 7) {
+      vars <- selected_variables()
+      numericInput("pred8", vars[8], value = round(mean(data[[vars[8]]]), 3))
+    }
+  })
+  output$pred9 <- renderUI({
+    if (length(selected_variables()) > 8) {
+      vars <- selected_variables()
+      numericInput("pred9", vars[9], value = round(mean(data[[vars[9]]]), 3))
+    }
+  })
+  output$pred10 <- renderUI({
+    if (length(selected_variables()) > 9) {
+      vars <- selected_variables()
+      numericInput("pred10", vars[10], value = round(mean(data[[vars[10]]]), 3))
+    }
+  })
+  # output$pred11 <- renderUI({
+  #   if (length(selected_variables()) > 10) {
+  #     vars <- selected_variables()
+  #     numericInput("pred11", vars[11], value = round(mean(data[[vars[11]]]), 3))
+  #   }
+  # })
+  # output$pred12 <- renderUI({
+  #   if (length(selected_variables()) > 11) {
+  #     vars <- selected_variables()
+  #     numericInput("pred12", vars[12], value = round(mean(data[[vars[12]]]), 3))
+  #   }
+  # })
+  # output$pred13 <- renderUI({
+  #   if (length(selected_variables()) > 12) {
+  #     vars <- selected_variables()
+  #     numericInput("pred13", vars[13], value = round(mean(data[[vars[13]]]), 3))
+  #   }
+  # })
+  # output$pred14 <- renderUI({
+  #   if (length(selected_variables()) > 13) {
+  #     vars <- selected_variables()
+  #     numericInput("pred14", vars[14], value = round(mean(data[[vars[14]]]), 3))
+  #   }
+  # })
+  # output$pred15 <- renderUI({
+  #   if (length(selected_variables()) > 14) {
+  #     vars <- selected_variables()
+  #     numericInput("pred15", vars[15], value = round(mean(data[[vars[15]]]), 3))
+  #   }
+  # })
   
   output$summary <- DT::renderDataTable({
       data
@@ -129,20 +195,24 @@ function(input, output, session) {
   
   # printing fit if 1-4 variables are chosen
   output$formula <- renderPrint({
-    if (length(selected_variables()) > 0 & length(selected_variables()) < 5){
+    if (length(selected_variables()) > 0){
     print(fit())
     print(confusionMatrix(fit(), newdata = test)) }
     else {
-      print("Please select 1 - 4 variables as predictors")} })
+      print("Please select 1 - 10 variables as predictors")} })
   
   # if 4 variables are chosen, the interactive numerical inputs allow the user to predict if the tumor is bengin,
   # based on the inputs and the fit that was created above
   output$prediction <- renderPrint({
     vars <- selected_variables()
-    values <- c(input$pred1,input$pred2,input$pred3,input$pred4)
+    #subset values to length of vars
+    values <- c(input$pred1, input$pred2, input$pred3, input$pred4, 
+                input$pred5, input$pred6, input$pred7, input$pred8, 
+                input$pred9, input$pred10, input$pred11, input$pred12, 
+                input$pred13, input$pred14, input$pred15)[1:length(vars)]
+    
     accuracy <- reactive((round(max(fit()$results$Accuracy),2) * 100))
-    if (length(vars) == 4){
-      names <- c(vars[1],vars[2],vars[3],vars[4])
+      names <- vars[1:length(vars)]
       pred_obs <- data.frame(setNames(as.list(values), names))
       pred_obs
       prediction <- predict(fit(), newdata = pred_obs)
@@ -152,7 +222,7 @@ function(input, output, session) {
       else {
         cat("Using the", accuracy(), "% accurate fit, we predict this tumor to be Malignant")}
       
-}
+
   })
   }
 
